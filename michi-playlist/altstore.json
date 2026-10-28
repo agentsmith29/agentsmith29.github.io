@@ -1,0 +1,47 @@
+{
+  "name": "Michi Playlist",
+  "identifier": "io.github.agentsmith29.michi-playlist",
+  "subtitle": "Private music player",
+  "description": "Private music player for your Michi Playlist server: stream your library, download songs and playlists for offline listening, background playback and lock-screen controls. Connect through your VPN.",
+  "iconURL": "https://agentsmith29.github.io/michi-playlist/icon.png",
+  "website": "https://github.com/agentsmith29/Vibing-Michis-Playlist",
+  "tintColor": "#ff9f1c",
+  "featuredApps": [
+    "com.michiplaylist.app"
+  ],
+  "apps": [
+    {
+      "name": "Michi Playlist",
+      "bundleIdentifier": "com.michiplaylist.app",
+      "developerName": "agentsmith29",
+      "subtitle": "Your private music library",
+      "localizedDescription": "Private music player for your Michi Playlist server: stream your library, download songs and playlists for offline listening, background playback and lock-screen controls. Connect through your VPN.",
+      "iconURL": "https://agentsmith29.github.io/michi-playlist/icon.png",
+      "tintColor": "#ff9f1c",
+      "category": "entertainment",
+      "screenshots": [],
+      "versions": [
+        {
+          "version": "1.0.0",
+          "buildVersion": "1",
+          "date": "2026-10-28",
+          "localizedDescription": "Michi Playlist 1.0.0",
+          "downloadURL": "https://agentsmith29.github.io/michi-playlist/MichiPlaylist.ipa",
+          "size": 12256817,
+          "minOSVersion": "16.4"
+        }
+      ],
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": {
+          "NSFaceIDUsageDescription": "Allow MichiPlaylist to access your Face ID biometric data."
+        }
+      },
+      "version": "1.0.0",
+      "versionDate": "2026-10-28",
+      "downloadURL": "https://agentsmith29.github.io/michi-playlist/MichiPlaylist.ipa",
+      "size": 12256817
+    }
+  ],
+  "news": []
+}
