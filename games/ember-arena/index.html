@@ -58,7 +58,7 @@
           <div><kbd>Space</kbd> to drop a bomb</div>
           <div><kbd>Esc</kbd> menu · <kbd>M</kbd> mute</div>
         </div>
-        <p id="touch-note" class="muted small-print" hidden>Heads up: Ember Arena needs a keyboard for now.</p>
+        <p id="touch-note" class="muted small-print" hidden>On a touch screen: drag the left pad to move, tap the right button to drop a bomb. Landscape works best.</p>
       </div>
     </section>
 
@@ -118,6 +118,11 @@
       </div>
     </section>
   </main>
+
+  <div id="touch" hidden>
+    <div id="touch-pad" aria-label="Move"><div id="touch-knob"></div></div>
+    <button id="touch-bomb" type="button" aria-label="Drop bomb"></button>
+  </div>
 
   <button id="btn-mute" class="icon-btn" type="button" aria-label="Mute sound">
     <svg viewBox="0 0 16 16" aria-hidden="true" shape-rendering="crispEdges"><path d="M2 6h3l4-3v10l-4-3H2z"/><path class="wave" d="M11 5h1v1h1v4h-1v1h-1V5z"/></svg>

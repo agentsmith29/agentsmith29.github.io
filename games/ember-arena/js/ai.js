@@ -2,9 +2,9 @@
 import { W, H, FLOOR, WALL, CRATE, LAVA, FUSE, BLAST_TIME, VENT_WARN, idx, bombAt } from './sim.js';
 
 const DIFF = {
-  easy: { think: 0.4, aggro: 0.35, hunt: 0.3, slack: 0.55, mistake: 0.06 },
-  normal: { think: 0.22, aggro: 0.6, hunt: 0.7, slack: 0.4, mistake: 0.015 },
-  hard: { think: 0.1, aggro: 0.9, hunt: 1.2, slack: 0.3, mistake: 0 },
+  easy: { think: 0.4, aggro: 0.35, hunt: 0.3, slack: 0.55, mistake: 0.06, trap: false },
+  normal: { think: 0.22, aggro: 0.6, hunt: 0.8, slack: 0.4, mistake: 0.015, trap: false },
+  hard: { think: 0.1, aggro: 0.9, hunt: 1.6, slack: 0.3, mistake: 0, trap: true },
 };
 const DIR4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 
@@ -64,7 +64,7 @@ function think(s, p, bot) {
   let mine = 0;
   for (const b of s.bombs) if (b.owner === p.id) mine++;
   if (s.phase === 'play' && mine < p.maxBombs && !bombAt(s, x, y)) {
-    const v = bombValue(s, p, x, y);
+    const v = bombValue(s, p, x, y, cfg.trap);
     if ((v.crates || v.enemies) && Math.random() < cfg.aggro) {
       const d2 = dangerMap(s, { x, y, t: FUSE, range: p.fire });
       const g2 = search(s, p, d2, here);
@@ -85,7 +85,7 @@ function think(s, p, bot) {
     const cx = i % W, cy = (i / W) | 0;
     let score = 0;
     if (s.items[i]) score += 8;
-    const v = bombValue(s, p, cx, cy);
+    const v = bombValue(s, p, cx, cy, cfg.trap);
     score += v.crates + v.enemies * 3 * cfg.hunt;
     let near = 99;
     for (const q of enemies) near = Math.min(near, Math.abs(Math.round(q.x) - cx) + Math.abs(Math.round(q.y) - cy));
@@ -166,13 +166,17 @@ function pathTo(g, target) {
   return path.reverse();
 }
 
-function bombValue(s, p, x, y) {
+// What a bomb at (x, y) would achieve. With `trap`, opponents right next to the blast
+// lines count too: the bomb cuts off their escape even if it can't hit them directly.
+function bombValue(s, p, x, y, trap) {
   let crates = 0, enemies = 0;
-  for (const i of blastCells(s, x, y, p.fire)) {
-    if (s.grid[i] === CRATE) crates++;
-    for (const q of s.players) {
-      if (q.alive && q.id !== p.id && idx(Math.round(q.x), Math.round(q.y)) === i) enemies++;
-    }
+  const cells = blastCells(s, x, y, p.fire);
+  for (const i of cells) if (s.grid[i] === CRATE) crates++;
+  for (const q of s.players) {
+    if (!q.alive || q.id === p.id) continue;
+    const qx = Math.round(q.x), qy = Math.round(q.y), qi = idx(qx, qy);
+    if (cells.includes(qi)) enemies++;
+    else if (trap && Math.abs(qx - x) + Math.abs(qy - y) <= 2 && DIR4.some(([dx, dy]) => cells.includes(idx(qx + dx, qy + dy)))) enemies += 0.5;
   }
   return { crates, enemies };
 }

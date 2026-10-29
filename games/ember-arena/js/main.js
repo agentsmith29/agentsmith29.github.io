@@ -55,9 +55,16 @@ function showScreen(name) {
   document.body.classList.toggle('menu', name !== 'game');
   $('#hud').hidden = name !== 'game';
   $('#pause').hidden = true;
-  renderer.setInset(name === 'game' ? HUD_HEIGHT : 0);
+  $('#touch').hidden = !(isTouch && name === 'game');
+  renderer.setInset(name === 'game' ? $('#hud').offsetHeight || HUD_HEIGHT : 0);
   kb.active = name === 'game';
 }
+
+addEventListener('resize', () => { if (!$('#hud').hidden) renderer.setInset($('#hud').offsetHeight || HUD_HEIGHT); });
+
+const isTouch = matchMedia('(pointer: coarse)').matches;
+if (isTouch) document.body.classList.add('touch');
+kb.bindTouch($('#touch-pad'), $('#touch-knob'), $('#touch-bomb'));
 
 function toast(text) {
   const el = document.createElement('div');

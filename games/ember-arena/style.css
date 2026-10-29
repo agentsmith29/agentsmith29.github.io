@@ -308,6 +308,40 @@ kbd {
 .pause-card { width: min(380px, 100%); text-align: center; }
 .pause-card p { margin: 8px 0 16px; }
 
+/* ---------------------------------------------------------------- touch controls */
+
+#touch { position: fixed; inset: auto 0 0 0; z-index: 3; pointer-events: none; }
+#touch-pad, #touch-bomb { position: fixed; bottom: max(20px, env(safe-area-inset-bottom)); pointer-events: auto; touch-action: none; }
+#touch-pad {
+  left: max(20px, env(safe-area-inset-left));
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 2px solid rgba(255, 255, 255, 0.14);
+  display: grid;
+  place-items: center;
+}
+#touch-knob {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+#touch-bomb {
+  right: max(24px, env(safe-area-inset-right));
+  bottom: max(40px, env(safe-area-inset-bottom));
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: 0;
+  background: radial-gradient(circle at 35% 30%, #5a5370 0 18%, #2a2536 19% 100%);
+  box-shadow: 0 0 0 3px rgba(255, 138, 42, 0.6), 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+#touch-bomb.down { transform: scale(0.92); box-shadow: 0 0 0 3px #ffd34d, 0 0 26px rgba(255, 138, 42, 0.7); }
+body.touch #btn-mute { bottom: auto; top: 84px; }
+
 #toasts {
   position: fixed;
   left: 50%;
@@ -341,6 +375,22 @@ kbd {
 @media (max-width: 480px) {
   .card { padding: 22px 18px; }
   .menu-buttons { grid-template-columns: 1fr; }
+}
+/* Landscape phones: keep the HUD to a slim strip so the arena gets the height. */
+@media (max-height: 500px) {
+  #hud { height: 44px; padding: 4px 12px; gap: 10px; }
+  #hud-timer { font-size: 20px; }
+  #hud-round { display: none; }
+  #hud-center { min-width: 64px; }
+  .chip { padding: 2px 8px 2px 4px; gap: 6px; }
+  .chip > canvas { width: 24px; height: 30px; }
+  .chip-stats { display: none; }
+  .chip-name { font-size: 12px; }
+  #btn-menu { width: 34px; height: 34px; }
+  body.touch #btn-mute { top: 54px; }
+  #screen-game { padding-top: 52px; }
+  #touch-pad { width: 128px; height: 128px; }
+  #touch-bomb { width: 84px; height: 84px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
