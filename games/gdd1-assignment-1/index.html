@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity WebGL Player | GDD1 - Assignment 1</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+    <script src="TemplateData/UnityProgress.js"></script>
+    <script src="Build/UnityLoader.js"></script>
+    <script>
+      var gameInstance = UnityLoader.instantiate("gameContainer", "Build/tmp.json", {onProgress: UnityProgress});
+    </script>
+    <style>
+      .back-home {position: fixed; top: 12px; left: 16px; z-index: 10; font: 14px/1 Helvetica, Verdana, Arial, sans-serif; color: #fff; text-decoration: none; padding: 9px 14px; border-radius: 6px; background: rgba(35,31,32,0.85);}
+      .back-home:hover {background: #231F20;}
+    </style>
+  </head>
+  <body>
+    <a class="back-home" href="../../">&larr; All projects</a>
+    <div class="webgl-content">
+      <div id="gameContainer" style="width: 1280px; height: 720px"></div>
+      <div class="footer">
+        <div class="webgl-logo"></div>
+        <div class="fullscreen" onclick="gameInstance.SetFullscreen(1)"></div>
+        <div class="title">GDD1 - Assignment 1</div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,25 +1,262 @@
 <!DOCTYPE html>
-<html lang="en-us">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity WebGL Player | GDD1 - Assignment 1</title>
-    <link rel="shortcut icon" href="TemplateData/favicon.ico">
-    <link rel="stylesheet" href="TemplateData/style.css">
-    <script src="TemplateData/UnityProgress.js"></script>
-    <script src="Build/UnityLoader.js"></script>
-    <script>
-      var gameInstance = UnityLoader.instantiate("gameContainer", "Build/tmp.json", {onProgress: UnityProgress});
-    </script>
-  </head>
-  <body>
-    <div class="webgl-content">
-      <div id="gameContainer" style="width: 1280px; height: 720px"></div>
-      <div class="footer">
-        <div class="webgl-logo"></div>
-        <div class="fullscreen" onclick="gameInstance.SetFullscreen(1)"></div>
-        <div class="title">GDD1 - Assignment 1</div>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>agentsmith29</title>
+  <meta name="description" content="Games and apps by agentsmith29.">
+  <link rel="icon" href="games/gdd1-assignment-1/TemplateData/favicon.ico">
+  <style>
+    :root {
+      --bg: #f6f5f2;
+      --surface: #ffffff;
+      --text: #1b1a19;
+      --muted: #6b6864;
+      --border: #e4e1dc;
+      --accent: #ff9f1c;
+      --accent-ink: #1b1a19;
+      --shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06);
+      --radius: 16px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #131212;
+        --surface: #1d1b1b;
+        --text: #f1efec;
+        --muted: #9d9893;
+        --border: #2e2b2a;
+        --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    a { color: inherit; }
+
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+
+    header.hero { padding: 72px 0 40px; }
+    .eyebrow {
+      font: 600 13px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    h1 {
+      margin: 14px 0 12px;
+      font-size: clamp(36px, 6vw, 56px);
+      line-height: 1.05;
+      letter-spacing: -.02em;
+    }
+    .lead { margin: 0; max-width: 560px; font-size: 18px; color: var(--muted); }
+
+    section { padding: 28px 0; }
+    .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+    h2 { margin: 0; font-size: 22px; letter-spacing: -.01em; }
+    .section-head span { color: var(--muted); font-size: 14px; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      text-decoration: none;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    a.card:hover, a.card:focus-visible { transform: translateY(-3px); border-color: var(--accent); outline: none; }
+    .card-body { padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+    .card h3 { margin: 0; font-size: 18px; }
+    .card p { margin: 0; color: var(--muted); font-size: 15px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: 8px; }
+    .tag {
+      font: 500 12px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    /* Game cover: drawn in CSS so no screenshot is needed. */
+    .cover {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      background:
+        radial-gradient(circle at 78% 30%, rgba(255,159,28,.55), transparent 45%),
+        radial-gradient(circle at 15% 85%, rgba(90,120,255,.45), transparent 50%),
+        #231f20;
+      display: grid;
+      place-items: center;
+    }
+    .cover::before {
+      content: "";
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    .play {
+      position: relative;
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.14);
+      backdrop-filter: blur(4px);
+      display: grid; place-items: center;
+      transition: transform .18s ease, background .18s ease;
+    }
+    .play::after {
+      content: "";
+      margin-left: 5px;
+      border-style: solid;
+      border-width: 11px 0 11px 18px;
+      border-color: transparent transparent transparent #fff;
+    }
+    a.card:hover .play { transform: scale(1.08); background: var(--accent); }
+    .cover-label {
+      position: absolute; left: 14px; bottom: 12px;
+      font: 600 12px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: rgba(255,255,255,.75);
+      letter-spacing: .06em; text-transform: uppercase;
+    }
+
+    .card.placeholder {
+      box-shadow: none;
+      background: transparent;
+      border-style: dashed;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 220px;
+      padding: 24px;
+    }
+
+    /* App row */
+    .app { flex-direction: row; align-items: center; gap: 18px; padding: 20px; flex-wrap: wrap; }
+    .app img { width: 72px; height: 72px; border-radius: 18px; flex: none; }
+    .app .info { flex: 1 1 220px; min-width: 0; }
+    .app .info p { margin-top: 4px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font: 600 14px/1 inherit;
+      font-family: inherit;
+      padding: 11px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--muted); }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+    .btn.primary:hover { filter: brightness(1.05); }
+    .source-url {
+      margin-top: 10px;
+      font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: var(--muted);
+      word-break: break-all;
+    }
+
+    footer { padding: 48px 0 56px; color: var(--muted); font-size: 14px; }
+    footer a { color: var(--muted); }
+
+    @media (max-width: 520px) {
+      header.hero { padding: 48px 0 24px; }
+      .grid { grid-template-columns: 1fr; }
+      .actions { width: 100%; }
+      .actions .btn { flex: 1; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="eyebrow">agentsmith29.github.io</div>
+      <h1>Games &amp; side projects</h1>
+      <p class="lead">Small things I build in my spare time: browser games made with Unity, and a few iOS apps you can sideload.</p>
+    </header>
+
+    <section id="games">
+      <div class="section-head">
+        <h2>Games</h2>
+        <span>Play in your browser · best on desktop</span>
       </div>
-    </div>
-  </body>
+      <div class="grid">
+        <!--
+          To add a game: put its Unity WebGL build in games/<slug>/
+          and copy one of these cards, pointing href at that folder.
+        -->
+        <a class="card" href="games/gdd1-assignment-1/">
+          <div class="cover">
+            <div class="play" aria-hidden="true"></div>
+            <div class="cover-label">Unity WebGL</div>
+          </div>
+          <div class="card-body">
+            <h3>GDD1 – Assignment 1</h3>
+            <p>Assignment 1 for the GDD1 course, built with Unity.</p>
+            <div class="tags">
+              <span class="tag">Unity</span>
+              <span class="tag">WebGL</span>
+            </div>
+          </div>
+        </a>
+
+        <div class="card placeholder">
+          <p>Another game is on the way.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="apps">
+      <div class="section-head">
+        <h2>iOS apps</h2>
+        <span>Sideload with AltStore</span>
+      </div>
+      <div class="card app">
+        <img src="michi-playlist/icon.png" alt="" width="72" height="72">
+        <div class="info">
+          <h3>Michi Playlist</h3>
+          <p>Private music player for your Michi Playlist server: streaming, offline downloads, background playback and lock-screen controls.</p>
+          <div class="source-url" id="source-url">https://agentsmith29.github.io/michi-playlist/altstore.json</div>
+        </div>
+        <div class="actions">
+          <a class="btn primary" href="altstore://source?url=https://agentsmith29.github.io/michi-playlist/altstore.json">Add to AltStore</a>
+          <button class="btn" type="button" id="copy-source">Copy source URL</button>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <a href="https://github.com/agentsmith29">github.com/agentsmith29</a>
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById('copy-source').addEventListener('click', function () {
+      var btn = this;
+      var url = document.getElementById('source-url').textContent.trim();
+      var done = function () {
+        btn.textContent = 'Copied';
+        setTimeout(function () { btn.textContent = 'Copy source URL'; }, 1600);
+      };
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(done, function () { window.prompt('Source URL', url); });
+      } else {
+        window.prompt('Source URL', url);
+      }
+    });
+  </script>
+</body>
 </html>
