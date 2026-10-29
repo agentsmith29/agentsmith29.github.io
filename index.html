@@ -106,6 +106,13 @@
         linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px);
       background-size: 28px 28px;
     }
+    .cover-ember {
+      background:
+        radial-gradient(circle at 50% 60%, rgba(255,122,47,.6), transparent 50%),
+        radial-gradient(circle at 15% 20%, rgba(212,107,255,.35), transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(76,184,255,.35), transparent 40%),
+        #1a1520;
+    }
     .play {
       position: relative;
       width: 64px; height: 64px;
@@ -213,9 +220,21 @@
           </div>
         </a>
 
-        <div class="card placeholder">
-          <p>Another game is on the way.</p>
-        </div>
+        <a class="card" href="games/ember-arena/">
+          <div class="cover cover-ember">
+            <div class="play" aria-hidden="true"></div>
+            <div class="cover-label">Online multiplayer</div>
+          </div>
+          <div class="card-body">
+            <h3>Ember Arena</h3>
+            <p>A retro arena bomb game for 1–4 players. Play against bots or send a friend an invite link.</p>
+            <div class="tags">
+              <span class="tag">HTML5</span>
+              <span class="tag">1–4 players</span>
+              <span class="tag">Online</span>
+            </div>
+          </div>
+        </a>
       </div>
     </section>
 
