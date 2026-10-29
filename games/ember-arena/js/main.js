@@ -16,6 +16,7 @@ const SEND_EVERY = 2;          // ticks between snapshots (30 per second)
 const INTERP_TICKS = 5;        // draw remote players this many ticks in the past
 const PEER_TIMEOUT = 8000;     // ms of silence before a peer counts as gone
 const HUD_HEIGHT = 68;
+const FAST_FORWARD = 4;        // sim speed once only bots are left fighting
 const BOT_NAMES = ['Cinder', 'Wisp', 'Flicker', 'Blaze'];
 const DIFF_LABEL = { easy: 'Easy', normal: 'Normal', hard: 'Hard' };
 const SLOT_CYCLE = ['open', 'bot:normal', 'bot:hard', 'bot:easy', 'local2'];
@@ -55,6 +56,7 @@ function showScreen(name) {
   document.body.classList.toggle('menu', name !== 'game');
   $('#hud').hidden = name !== 'game';
   $('#pause').hidden = true;
+  $('#ff').hidden = true;
   $('#touch').hidden = !(isTouch && name === 'game');
   renderer.setInset(name === 'game' ? $('#hud').offsetHeight || HUD_HEIGHT : 0);
   kb.active = name === 'game';
@@ -382,7 +384,7 @@ function onGuestData(m) {
 function startGuestGame(m) {
   app.settings = m.settings;
   app.game = {
-    role: 'guest', you: m.you, roster: m.roster, view: Sim.emptyView(), snaps: [], pending: [],
+    role: 'guest', you: m.you, roster: m.roster, view: Sim.emptyView(), snaps: [], pending: [], speed: 1,
     seq: 0, got: false, pred: null, disp: null, lastCount: '', goUntil: 0, suddenUntil: 0,
   };
   kb.solo = true;
@@ -398,6 +400,7 @@ function onSnapshot(g, m) {
   const ack = m.a?.[g.you];
   if (ack != null) g.pending = g.pending.filter((i) => i.s > ack);
   for (const ev of m.ev || []) onEvent(ev);
+  g.speed = m.x || 1;
   g.got = true;
 }
 
@@ -429,7 +432,7 @@ function predict(g) {
 
 function guestPlayers(g, now, dt) {
   const snaps = g.snaps, latest = snaps[snaps.length - 1];
-  const rt = latest.k + (now - latest.at) * 0.06 - INTERP_TICKS;
+  const rt = latest.k + (now - latest.at) * 0.06 * g.speed - INTERP_TICKS * g.speed;
   let a = latest, b = latest;
   for (let i = snaps.length - 1; i > 0; i--) {
     if (snaps[i - 1].k <= rt) { a = snaps[i - 1]; b = snaps[i]; break; }
@@ -468,7 +471,7 @@ function startMatch() {
   kb.solo = !app.slots.some((sl) => sl.kind === 'local2');
   app.game = {
     role: app.mode === 'host' ? 'host' : 'offline', s, ctrl, roster, you: 0,
-    lastGv: -1, sent: 0, outEvents: [], paused: false, lastCount: '', goUntil: 0, suddenUntil: 0,
+    lastGv: -1, sent: 0, outEvents: [], paused: false, lastCount: '', goUntil: 0, suddenUntil: 0, speed: 1,
   };
   if (app.mode === 'host') {
     for (const id of app.net.ids()) {
@@ -505,16 +508,29 @@ function hostTick(g) {
   Sim.tick(s);
   for (const ev of s.events) { onEvent(ev); g.outEvents.push(ev); }
   s.events.length = 0;
-  if (g.role === 'host' && ++g.sent % SEND_EVERY === 0) {
+  if (g.role === 'host' && ++g.sent % (SEND_EVERY * g.speed) === 0) {
     const acks = {};
     for (const id in g.ctrl) if (g.ctrl[id].type === 'remote') acks[id] = g.ctrl[id].ack;
     const withGrid = s.gridVer !== g.lastGv || g.sent % 120 === 0;
     g.lastGv = s.gridVer;
     const m = Sim.snapshot(s, withGrid, acks);
     m.ev = g.outEvents;
+    m.x = g.speed;
     g.outEvents = [];
     app.net.broadcast(m);
   }
+}
+
+// Once every human is out of the round, nobody needs to watch the bots play it out in real time.
+function speedFor(g) {
+  if (g.role === 'guest' || g.paused || g.s.phase !== 'play') return 1;
+  let human = false, bot = false;
+  for (const p of g.s.players) {
+    if (!p.alive) continue;
+    if (g.ctrl[p.id].type === 'bot') bot = true;
+    else human = true;
+  }
+  return bot && !human ? FAST_FORWARD : 1;
 }
 
 function backToLobby() {
@@ -640,7 +656,8 @@ function updateOverlay(view, g) {
       : '<button class="btn" data-act="rematch">Rematch</button><button class="btn secondary" data-act="lobby">Back to lobby</button>';
     html = `<div class="card result"><div class="eyebrow">Match over</div>
       <h2 style="--pc:${PALETTES[view.champion].glow}">${esc(rosterName(g, view.champion))} wins!</h2>
-      <ol class="standings">${standings}</ol><div class="actions">${actions}</div></div>`;
+      <ol class="standings">${standings}</ol><div class="actions">${actions}</div>
+      <a class="home-link" href="../../">← All projects</a></div>`;
   }
   if (key !== overlayKey) {
     overlayKey = key;
@@ -722,9 +739,12 @@ let last = performance.now(), acc = 0, lastBeat = 0;
 function pump(now, draw) {
   const dt = Math.min(0.1, (now - last) / 1000);
   last = now;
-  acc += dt;
+  const g0 = app.game;
+  const speed = g0 && g0.role !== 'guest' ? (g0.speed = speedFor(g0)) : 1;
+  acc += dt * speed;
+  const maxSteps = 8 * speed;
   let steps = 0;
-  while (acc >= Sim.TICK && steps < 8) {
+  while (acc >= Sim.TICK && steps < maxSteps) {
     acc -= Sim.TICK;
     steps++;
     const g = app.game;
@@ -732,7 +752,7 @@ function pump(now, draw) {
     if (g?.role === 'guest') guestTick(g);
     else if (g && !g.paused) hostTick(g);
   }
-  if (steps === 8) acc = 0;
+  if (steps === maxSteps) acc = 0;
   if (now - lastBeat > 1000) { lastBeat = now; heartbeat(now); }
   if (draw) render(dt, acc / Sim.TICK, now);
 }
@@ -745,7 +765,9 @@ function render(dt, alpha, now) {
   }
   const view = g.role === 'guest' ? g.view : g.s;
   const players = g.role === 'guest' ? guestPlayers(g, now, dt) : interp(view, alpha);
-  renderer.draw(view, players, { dt, labels: labelsFor(view, g) });
+  const fast = g.speed > 1 && view.phase === 'play';
+  renderer.draw(view, players, { dt: dt * (fast ? g.speed : 1), labels: labelsFor(view, g) });
+  $('#ff').hidden = !fast;
   updateHud(view, g);
   updateOverlay(view, g);
 }

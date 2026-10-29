@@ -398,7 +398,7 @@ export class Renderer {
   drawLabels(players, labels, sx, sy) {
     const g = this.g, S = this.scale;
     const size = Math.max(11, Math.round(5 * S));
-    g.font = `600 ${size}px "Pixelify Sans", ui-monospace, monospace`;
+    g.font = `500 ${size}px "Pixelify Sans", ui-monospace, monospace`;
     g.textAlign = 'center';
     g.textBaseline = 'bottom';
     g.lineJoin = 'round';

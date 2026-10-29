@@ -8,7 +8,7 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath fill='%235a1608' d='M7 1h2v2h2v2h1v2h1v6h-1v1h-1v1H5v-1H4v-1H3V7h1V5h1V3h2z'/%3E%3Cpath fill='%23e8501c' d='M8 3h1v2h1v2h1v2h1v3h-1v1H5v-1H4V9h1V7h1V5h2z'/%3E%3Cpath fill='%23ffe7a3' d='M7 8h2v1h1v3H6V9h1z'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <script type="module" src="js/main.js"></script>
@@ -103,10 +103,12 @@
 
         <button id="btn-start" class="btn big-btn" type="button">Start match</button>
         <p id="lobby-wait" class="muted center" hidden>Waiting for the host to start the match…</p>
+        <a class="home-link" href="../../">← All projects</a>
       </div>
     </section>
 
     <section id="screen-game" class="screen" hidden>
+      <div id="ff" hidden>Bots only · fast-forward ×4</div>
       <div id="overlay" aria-live="polite"></div>
       <div id="pause" class="card pause-card" hidden>
         <h2 id="pause-title">Paused</h2>
@@ -115,6 +117,7 @@
           <button id="btn-resume" class="btn" type="button">Resume</button>
           <button id="btn-quit" class="btn secondary" type="button">Quit to lobby</button>
         </div>
+        <a class="home-link" href="../../">← All projects</a>
       </div>
     </section>
   </main>

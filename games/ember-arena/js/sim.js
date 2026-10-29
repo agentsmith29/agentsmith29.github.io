@@ -332,9 +332,9 @@ function moveStep(s, p, dx, dy, d, authoritative) {
 function tryKick(s, p, x, y, dx, dy) {
   const b = bombAt(s, x, y);
   if (!b || b.vx || b.vy || !bombCanEnter(s, b, x + dx, y + dy)) return;
+  // Keep b.pass: whoever is still standing on the bomb stays allowed there until they step off.
   b.vx = dx * KICK_SPEED;
   b.vy = dy * KICK_SPEED;
-  b.pass = [];
   s.events.push({ t: 'kick', x, y });
 }
 
@@ -420,11 +420,14 @@ function slideBomb(s, b, dt) {
   while (d > 0) {
     const cx = Math.round(b.x), cy = Math.round(b.y);
     const past = (b.x - cx) * dx + (b.y - cy) * dy;
-    if (past >= -1e-6 && !bombCanEnter(s, b, cx + dx, cy + dy)) {
+    const step = Math.min(d, 0.1);
+    // Check again right before crossing into the next tile: someone may have stepped
+    // into it since the bomb passed the middle of this one.
+    const crossing = Math.round(b.x + dx * step) !== cx || Math.round(b.y + dy * step) !== cy;
+    if ((past >= -1e-6 || crossing) && !bombCanEnter(s, b, cx + dx, cy + dy)) {
       b.x = cx; b.y = cy; b.vx = 0; b.vy = 0;
       return;
     }
-    const step = Math.min(d, 0.1);
     b.x += dx * step;
     b.y += dy * step;
     d -= step;
